@@ -1,0 +1,62 @@
+"""Application configuration using Pydantic Settings."""
+
+from pydantic_settings import BaseSettings
+from typing import List
+from functools import lru_cache
+
+
+class Settings(BaseSettings):
+    # App
+    APP_NAME: str = "AI Web Scraper"
+    VERSION: str = "1.0.0"
+    DEBUG: bool = False
+    HOST: str = "0.0.0.0"
+    PORT: int = 8000
+    WORKERS: int = 4
+
+    # Security
+    SECRET_KEY: str = "change-this-in-production-use-secrets"
+    API_KEY_HEADER: str = "X-API-Key"
+    ALLOWED_ORIGINS: List[str] = ["*"]
+
+    # Database (SQLite for dev, PostgreSQL for prod)
+    DATABASE_URL: str = "sqlite+aiosqlite:///./scraper.db"
+
+    # Redis (for job queue)
+    REDIS_URL: str = "redis://localhost:6379/0"
+
+    # OpenAI / LangChain
+    OPENAI_API_KEY: str = ""
+    LLM_MODEL: str = "gpt-4o-mini"
+    LLM_TEMPERATURE: float = 0.0
+    MAX_TOKENS: int = 4096
+
+    # Scraping
+    DEFAULT_TIMEOUT: int = 30
+    MAX_RETRIES: int = 3
+    RETRY_DELAY: float = 2.0
+    MAX_CONCURRENT_SCRAPES: int = 10
+    DEFAULT_DELAY_BETWEEN_REQUESTS: float = 1.0  # polite delay
+    USER_AGENT: str = (
+        "Mozilla/5.0 (compatible; AIWebScraper/1.0; +https://github.com/yourname/ai-web-scraper)"
+    )
+
+    # Playwright
+    PLAYWRIGHT_HEADLESS: bool = True
+    PLAYWRIGHT_BROWSER: str = "chromium"  # chromium | firefox | webkit
+
+    # Export
+    EXPORT_DIR: str = "./exports"
+    MAX_EXPORT_ROWS: int = 50000
+
+    class Config:
+        env_file = ".env"
+        env_file_encoding = "utf-8"
+
+
+@lru_cache()
+def get_settings() -> Settings:
+    return Settings()
+
+
+settings = get_settings()
